@@ -1,25 +1,25 @@
 variable "gcp_credentials" {
-  type = string
-  sensitive = true
+  type        = string
+  sensitive   = true
   description = "Google Cloud service account credentials"
 }
 
 variable "gcp_project_id" {
-    type = string
-    sensitive = false
-    description = "Google Cloud project ID"
+  type        = string
+  sensitive   = false
+  description = "Google Cloud project ID"
 }
 
 variable "gcp_region" {
-    type = string
-    sensitive = false
-    description = "Google Cloud region"
+  type        = string
+  sensitive   = false
+  description = "Google Cloud region"
 }
 
 variable "gcp_zone" {
-    type = string
-    sensitive = false
-    description = "Google Cloud zone"
+  type        = string
+  sensitive   = false
+  description = "Google Cloud zone"
 }
 
 variable "gke_num_nodes" {
