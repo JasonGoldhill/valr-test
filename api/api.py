@@ -8,4 +8,4 @@ app.config["DEBUG"] = True
 def home():
     return "Hello World"
 
-app.run()
+app.run(host="0.0.0.0")
