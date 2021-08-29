@@ -29,6 +29,7 @@ provider "google" {
 data "google_client_config" "default" {}
 data "google_container_cluster" "my_cluster" {
   name = "${var.gcp_project_id}-gke"
+  zone = var.gcp_region
 }
 
 provider "kubernetes" {
