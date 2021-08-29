@@ -112,7 +112,7 @@ jobs:
         credentials: ${{ secrets.GCP_SA_KEY }}
 
     - name: Replace image in deployment.yaml
-      uses: ./.github/actions/replace
+      uses: datamonsters/replace-action
       with:
         files: deployment.yaml
         replacements: 'gcr.io/valr-test/valr-test-image=gcr.io/valr-test/valr-test-image:${{ github.sha }}'
