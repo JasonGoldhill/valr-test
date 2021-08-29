@@ -8,13 +8,82 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  IMAGE_NAME: ${{ secrets.GCP_IMAGE_NAME }}
+  IMAGE_NAME: valr-test-image
+  CLUSTER_NAME: valr-test-gke
+  ZONE: europe-west1-b
 
 jobs:
-  docker:
-    name: Docker
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform format
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform init
+        id: init
+        run: terraform init
+      
+      - name: Terraform validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform plan
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color
+        continue-on-error: true
+
+      - name: Update PR with plan details
+        uses: actions/github-script@0.9.0
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+            <details><summary>Show Plan</summary>
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+            </details>
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Exit if plan failed
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve
+
+  docker-and-k8s:
+    name: Docker and Kubernetes
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: terraform
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -23,7 +92,7 @@ jobs:
       uses: google-github-actions/setup-gcloud@master
       with:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        project_id: ${{ env.PROJECT_ID }}
         export_default_credentials: true
 
     - name: Configure docker with gcloud
@@ -34,67 +103,15 @@ jobs:
 
     - name: Publish docker image to container registry
       run: docker push "gcr.io/$PROJECT_ID/$IMAGE_NAME:$GITHUB_SHA"
-  
-  # terraform:
-  #   name: "Terraform"
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: terraform
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v2
 
-  #     - name: Terraform Setup
-  #       uses: hashicorp/setup-terraform@v1
-  #       with:
-  #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+    - name: Setup cluster details
+      uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+      with:
+        cluster_name: ${{ env.CLUSTER_NAME }}
+        location: ${{ env.ZONE }}
+        credentials: ${{ secrets.GCP_SA_KEY }}
 
-  #     - name: Terraform Format
-  #       id: fmt
-  #       run: terraform fmt -check
-
-  #     - name: Terraform Init
-  #       id: init
-  #       run: terraform init
-      
-  #     - name: Terraform Validate
-  #       id: validate
-  #       run: terraform validate -no-color
-
-  #     - name: Terraform Plan
-  #       id: plan
-  #       if: github.event_name == 'pull_request'
-  #       run: terraform plan -no-color
-  #       continue-on-error: true
-
-  #     - uses: actions/github-script@0.9.0
-  #       if: github.event_name == 'pull_request'
-  #       env:
-  #         PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-  #       with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         script: |
-  #           const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-  #           #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-  #           #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-  #           #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-  #           <details><summary>Show Plan</summary>
-  #           \`\`\`\n
-  #           ${process.env.PLAN}
-  #           \`\`\`
-  #           </details>
-  #           *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-  #           github.issues.createComment({
-  #             issue_number: context.issue.number,
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             body: output
-  #           })
-  #     - name: Terraform Plan Status
-  #       if: steps.plan.outcome == 'failure'
-  #       run: exit 1
-
-  #     - name: Terraform Apply
-  #       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-  #       run: terraform apply -auto-approve
+    - name: Apply kubernetes manifests
+      run: |
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
