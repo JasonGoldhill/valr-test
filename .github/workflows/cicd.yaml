@@ -112,10 +112,11 @@ jobs:
         credentials: ${{ secrets.GCP_SA_KEY }}
 
     - name: Replace image in deployment.yaml
-      uses: datamonsters/replace-action
+      uses: jacobtomlinson/gha-find-replace@master
       with:
-        files: deployment.yaml
-        replacements: 'gcr.io/valr-test/valr-test-image=gcr.io/valr-test/valr-test-image:${{ github.sha }}'
+        find: "gcr.io/valr-test/valr-test-image"
+        replace: "gcr.io/valr-test/valr-test-image:${{ github.sha }}"
+        include: deployment.yaml
 
     - name: Check deployment
       run: cat deployment.yaml
