@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-deployment
+  name: api
   labels:
     app: api
 spec:
@@ -17,6 +17,6 @@ spec:
       containers:
         - name: api
           image: valr-api
-          imagePullPolicy: Never
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
