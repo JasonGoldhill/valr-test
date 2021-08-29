@@ -45,6 +45,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform format
+        id: fmt
+        run: terraform fmt -check
+
       - name: Setup go
         uses: actions/setup-go@v2
         with:
@@ -57,15 +66,6 @@ jobs:
         run: |
           tfk8s -f ../deployment.yaml -o k8s-deployment.tf
           tfk8s -f ../service.yaml -o k8s-service.tf
-
-      - name: Terraform setup
-        uses: hashicorp/setup-terraform@v1
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Terraform format
-        id: fmt
-        run: terraform fmt -check
 
       - name: Terraform init
         id: init
