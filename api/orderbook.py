@@ -1,5 +1,20 @@
 bids = []
 asks = []
+tradeHistory = []
+
+def getOrderbook():
+    orderbook = {
+        "Asks": asks,
+        "Bids": bids
+    }
+
+    return orderbook
+
+def getTradeHistory():
+    history = {
+        "TradeHistory": tradeHistory
+    }
+    return history
 
 def newLimitOrder(side, quantity, price):
     order = {
@@ -62,22 +77,22 @@ def updateBids(order):
         bids.append(order)
 
 def fillBid(order):
-    for bid in bids:
+    for bid in list(bids):
         if bid["price"] < order["price"]:
             break
         if bid["quantity"] > order["quantity"]:
+            updateTradeHistory(bid["price"], order["quantity"], "sell")
             bid["quantity"] = bid["quantity"] - order["quantity"]
             order["quantity"] = 0
-            # update transaction history here
             break
         elif order["quantity"] > bid["quantity"]:
+            updateTradeHistory(bid["price"], bid["quantity"], "sell")
             bids.remove(bid)
             order["quantity"] = order["quantity"] - bid["quantity"]
-            # update transaction history here
         else:
+            updateTradeHistory(bid["price"], order["quantity"], "sell")
             bids.remove(bid)
             order["quantity"] = 0
-            # update transaction history here
             break
 
     if order["quantity"] > 0:
@@ -87,22 +102,22 @@ def fillBid(order):
         return "Order completely filled."
 
 def fillAsk(order):
-    for ask in asks:
+    for ask in list(asks):
         if ask["price"] > order["price"]:
             break
         if ask["quantity"] > order["quantity"]:
+            updateTradeHistory(ask["price"], order["quantity"], "buy")
             ask["quantity"] = ask["quantity"] - order["quantity"]
             order["quantity"] = 0
-            # update transaction history here
             break
         elif order["quantity"] > ask["quantity"]:
+            updateTradeHistory(ask["price"], ask["quantity"], "buy")
             asks.remove(ask)
             order["quantity"] = order["quantity"] - ask["quantity"]
-            # update transaction history here
         else:
+            updateTradeHistory(ask["price"], order["quantity"], "buy")
             asks.remove(ask)
             order["quantity"] = 0
-            # update transaction history here
             break
 
     if order["quantity"] > 0:
@@ -110,3 +125,15 @@ def fillAsk(order):
         return "Order partially filled. Remainder placed in orderbook."
     else:
         return "Order completely filled."
+
+def updateTradeHistory(price, quantity, takerSide):
+    entry = {
+        "quantity": quantity,
+        "price": price,
+        "takerSide": takerSide
+    }
+
+    tradeHistory.insert(0, entry)
+
+    if len(tradeHistory) > 100:
+        tradeHistory.pop()
