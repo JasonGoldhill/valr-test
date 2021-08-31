@@ -3,8 +3,6 @@ resource "google_container_cluster" "primary" {
   location           = var.gcp_region
   initial_node_count = var.gke_num_nodes
 
-  # network    = google_compute_network.vpc.name
-  # subnetwork = google_compute_subnetwork.subnet.name
   node_config {
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
