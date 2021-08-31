@@ -114,12 +114,16 @@ jobs:
     - name: Replace image in deployment.yaml
       uses: jacobtomlinson/gha-find-replace@master
       with:
-        find: "gcr.io/valr-test/valr-test-image"
-        replace: "gcr.io/valr-test/valr-test-image:${{ github.sha }}"
+        find: "image: valr-test"
+        replace: "image: gcr.io/valr-test/valr-test-image:${{ github.sha }}"
         include: deployment.yaml
 
-    - name: Check deployment
-      run: cat deployment.yaml
+    - name: Replace image pull policy in deployment.yaml
+      uses: jacobtomlinson/gha-find-replace@master
+      with:
+        find: "imagePullPolicy: Never"
+        replace: "imagePullPolicy: Always"
+        include: deployment.yaml
 
     - name: Apply kubernetes manifests
       run: |

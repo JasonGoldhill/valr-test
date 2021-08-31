@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: gcr.io/valr-test/valr-test-image
-          imagePullPolicy: Always
+          image: valr-test
+          imagePullPolicy: Never
           ports:
             - containerPort: 5000
