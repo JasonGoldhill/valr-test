@@ -1,3 +1,5 @@
+import math
+
 import flask
 from flask import request
 
@@ -23,12 +25,22 @@ def getOrderbook(pair):
 def placeLimitOrder():
     try:
         request_data = request.get_json()
-        side = request_data["side"]
-        quantity = request_data["quantity"]
-        price = request_data["price"]
-        pair = request_data["pair"]
-        response = orderbook.newLimitOrder(side, quantity, price, pair)
-        return response
+        side = request_data.get("side")
+        quantity = request_data.get("quantity")
+        price = request_data.get("price")
+        pair = request_data.get("pair")
+        postOnly = request_data.get("postOnly") or False
+        if side == None:
+            return "Side paramter is missing."
+        elif quantity == None or math.isnan(quantity) == True:
+            return "Quantity parameter is missing or not a valid quantity."
+        elif price == None or math.isnan(price) == True:
+            return "Price parameter is missing or not a valid price."
+        elif pair == None:
+            return "Pair parameter is missing."
+        else:
+            response = orderbook.newLimitOrder(side, quantity, price, pair, postOnly)
+            return response
     except Exception as e:
         print(e)
         return "An error occured"
@@ -37,7 +49,10 @@ def placeLimitOrder():
 def getTradeHistory(pair):
     try:
         limit = request.args.get('limit', 100)
-        return orderbook.getTradeHistory(pair, int(limit))
+        if limit.isnumeric() == False:
+            return "Invalid limit set."
+        else:
+            return orderbook.getTradeHistory(pair, int(limit))
     except Exception as e:
         print(e)
         return "An error occured"
