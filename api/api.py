@@ -11,10 +11,10 @@ app.config["DEBUG"] = True
 def home():
     return "Hello World"
 
-@app.route('/orderbook', methods=['GET'])
-def getOrderbook():
+@app.route('/orderbook/<pair>', methods=['GET'])
+def getOrderbook(pair):
     try:
-        return orderbook.getOrderbook()
+        return orderbook.getOrderbook(pair)
     except Exception as e:
         print(e)
         return "An error occured"
@@ -26,16 +26,17 @@ def placeLimitOrder():
         side = request_data["side"]
         quantity = request_data["quantity"]
         price = request_data["price"]
-        response = orderbook.newLimitOrder(side, quantity, price)
+        pair = request_data["pair"]
+        response = orderbook.newLimitOrder(side, quantity, price, pair)
         return response
     except Exception as e:
         print(e)
         return "An error occured"
 
-@app.route('/tradeHistory', methods=['GET'])
-def getTradeHistory():
+@app.route('/tradeHistory/<pair>', methods=['GET'])
+def getTradeHistory(pair):
     try:
-        return orderbook.getTradeHistory()
+        return orderbook.getTradeHistory(pair)
     except Exception as e:
         print(e)
         return "An error occured"
