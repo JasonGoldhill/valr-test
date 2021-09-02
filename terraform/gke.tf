@@ -19,4 +19,10 @@ resource "google_container_cluster" "primary" {
     create = "30m"
     update = "40m"
   }
+  ip_allocation_policy {
+    cluster_ipv4_cidr_block       = "10.92.0.0/14"
+    cluster_secondary_range_name  = "gke-${var.gcp_project_id}-gke-pods-09f3092d"
+    services_ipv4_cidr_block      = "10.96.0.0/20"
+    services_secondary_range_name = "gke-${var.gcp_project_id}-gke-services-09f3092d"
+  }
 }
