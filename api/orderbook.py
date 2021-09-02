@@ -29,7 +29,7 @@ def getOrderbook(pair):
 
     return orderbook
 
-def getTradeHistory(pair):
+def getTradeHistory(pair, limit):
     if pair.upper() == "BTCZAR":
         tradeHistory = btcTradeHistory
     elif pair.upper() == "ETHZAR":
@@ -39,9 +39,15 @@ def getTradeHistory(pair):
     else:
         return "Not a valid currency pair."
     
-    history = {
-        "TradeHistory": tradeHistory
-    }
+    if len(tradeHistory) > limit:
+        history = {
+            "TradeHistory": tradeHistory[:limit]
+        }
+    else:
+        history = {
+            "TradeHistory": tradeHistory[:limit]
+        }
+    
     return history
 
 def newLimitOrder(side, quantity, price, pair):

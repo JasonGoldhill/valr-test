@@ -36,7 +36,8 @@ def placeLimitOrder():
 @app.route('/tradeHistory/<pair>', methods=['GET'])
 def getTradeHistory(pair):
     try:
-        return orderbook.getTradeHistory(pair)
+        limit = request.args.get('limit', 100)
+        return orderbook.getTradeHistory(pair, int(limit))
     except Exception as e:
         print(e)
         return "An error occured"
