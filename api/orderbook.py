@@ -20,7 +20,7 @@ def getOrderbook(pair):
         bids = xrpBids
         asks = xrpAsks
     else:
-        return "Not a valid currency pair."
+        return "The pair parameter must be a valid currency pair."
     
     orderbook = {
         "Asks": asks,
@@ -37,7 +37,7 @@ def getTradeHistory(pair, limit):
     elif pair.upper() == "XRPZAR":
         tradeHistory = xrpTradeHistory
     else:
-        return "Not a valid currency pair."
+        return "The pair parameter must be a valid currency pair."
     
     if len(tradeHistory) > limit:
         history = {
@@ -69,7 +69,7 @@ def newLimitOrder(side, quantity, price, pair, postOnly):
         asks = xrpAsks
         tradeHistory = xrpTradeHistory
     else:
-        return "Not a valid currency pair."
+        return "The pair parameter must be a valid currency pair."
 
     if side.upper() == "SELL":
         if len(bids) > 0:
@@ -102,7 +102,7 @@ def newLimitOrder(side, quantity, price, pair, postOnly):
             return "Order placed."
 
     else:
-        return "Side parameter provided not valid. Must be BUY or SELL."
+        return "The side parameter must be either BUY or SELL."
 
 def updateAsks(order, asks):
     if len(asks) > 0:
