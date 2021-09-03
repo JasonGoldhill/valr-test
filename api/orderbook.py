@@ -20,7 +20,7 @@ def getOrderbook(pair):
         bids = xrpBids
         asks = xrpAsks
     else:
-        return "Not a valid currency pair."
+        return "The pair parameter must be a valid currency pair."
     
     orderbook = {
         "Asks": asks,
@@ -29,7 +29,7 @@ def getOrderbook(pair):
 
     return orderbook
 
-def getTradeHistory(pair):
+def getTradeHistory(pair, limit):
     if pair.upper() == "BTCZAR":
         tradeHistory = btcTradeHistory
     elif pair.upper() == "ETHZAR":
@@ -37,14 +37,20 @@ def getTradeHistory(pair):
     elif pair.upper() == "XRPZAR":
         tradeHistory = xrpTradeHistory
     else:
-        return "Not a valid currency pair."
+        return "The pair parameter must be a valid currency pair."
     
-    history = {
-        "TradeHistory": tradeHistory
-    }
+    if len(tradeHistory) > limit:
+        history = {
+            "TradeHistory": tradeHistory[:limit]
+        }
+    else:
+        history = {
+            "TradeHistory": tradeHistory[:limit]
+        }
+    
     return history
 
-def newLimitOrder(side, quantity, price, pair):
+def newLimitOrder(side, quantity, price, pair, postOnly):
     order = {
         "quantity": quantity,
         "price": price
@@ -63,7 +69,7 @@ def newLimitOrder(side, quantity, price, pair):
         asks = xrpAsks
         tradeHistory = xrpTradeHistory
     else:
-        return "Not a valid currency pair."
+        return "The pair parameter must be a valid currency pair."
 
     if side.upper() == "SELL":
         if len(bids) > 0:
@@ -71,23 +77,32 @@ def newLimitOrder(side, quantity, price, pair):
                 updateAsks(order, asks)
                 return "Order placed."
             else:
-                response = fillBid(order, bids, asks, tradeHistory)
-                return response
+                if postOnly == True:
+                    return "Post Only order cancelled as it would have matched."
+                else:
+                    response = fillBid(order, bids, asks, tradeHistory)
+                    return response
         else:
             updateAsks(order, asks)
             return "Order placed."
 
-    if side.upper() == "BUY":
+    elif side.upper() == "BUY":
         if len(asks) > 0:
             if order["price"] < asks[0]["price"]:
                 updateBids(order, bids)
                 return "Order placed."
             else:
-                response = fillAsk(order, bids, asks, tradeHistory)
-                return response
+                if postOnly == True:
+                    return "Post Only order cancelled as it would have matched."
+                else:
+                    response = fillAsk(order, bids, asks, tradeHistory)
+                    return response
         else:
             updateBids(order, bids)
-            return "Order placed." 
+            return "Order placed."
+
+    else:
+        return "The side parameter must be either BUY or SELL."
 
 def updateAsks(order, asks):
     if len(asks) > 0:
