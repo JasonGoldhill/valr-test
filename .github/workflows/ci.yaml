@@ -43,7 +43,7 @@ jobs:
       - name: Kubernetes manifests validation
         uses: instrumenta/kubeval-action@master
         with:
-          files: k8s/*
+          files: k8s
 
   validate-terraform:
     name: Validate Terraform
