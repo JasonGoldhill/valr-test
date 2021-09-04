@@ -16,10 +16,16 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Install requirements
+      - name: Python requirements
         run: pip install -r requirements.txt
 
-      - name: Unit tests
+      - name: Python linter
+        uses: py-actions/flake8@v1
+        with:
+          ignore: "E501"
+          path: "api"
+
+      - name: Python unit tests
         run: pytest
 
   terraform-plan:
