@@ -12,11 +12,11 @@ docker build . -t valr-test
 ```
 Next, making sure your Kubernetes conext is set correctly to your local instance, run the following command to create your Kubernetes Deployment:
 ```bash
-kubectl apply -f deployment.yaml
+kubectl apply -f k8s/deployment.yaml
 ```
 Finally, create your Kubernetes Service by running:
 ```bash
-kubectl apply -f service.yaml
+kubectl apply -f k8s/service.yaml
 ```
 The API should now be up and running! Depending on the setup of your local Kubernetes cluster you should now be able to access the API at `localhost:5000`. If not, you can try port-forwarding the service to your localhost by running:
 ```bash
