@@ -126,7 +126,7 @@ def test_getTradeHistory():
                 {"quantity": 0.5, "price": 150, "takerSide": "sell"},
                 {"quantity": 0.5, "price": 150, "takerSide": "sell"}
             ]
-        }
+    }
 
     assert orderbook.getTradeHistory("BTCZAR", 1) == {"TradeHistory": [
         {"quantity": 1, "price": 100, "takerSide": "sell"}]}
