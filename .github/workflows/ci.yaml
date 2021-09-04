@@ -22,6 +22,7 @@ jobs:
       - name: Python linter
         uses: py-actions/flake8@v1
         with:
+          ignore: "E501"
           path: "api"
 
       - name: Python unit tests

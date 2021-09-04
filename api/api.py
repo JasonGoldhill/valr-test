@@ -16,6 +16,7 @@ def home():
 def getOrderbook(pair):
     try:
         return orderbook.getOrderbook(pair)
+
     except Exception as e:
         print(e)
         return "An unexpected error occured."
@@ -43,9 +44,12 @@ def placeLimitOrder():
             return "The postOnly parameter is optional, but must be a valid boolean value (true or false) if provided (defaults to false)."
 
         else:
-            response = orderbook.newLimitOrder(
-                side, quantity, price, pair, postOnly)
-            return response
+            return orderbook.newLimitOrder(
+                side,
+                quantity,
+                price,
+                pair,
+                postOnly)
 
     except Exception as e:
         print(e)
@@ -60,7 +64,10 @@ def getTradeHistory(pair):
         if limit.isnumeric() is False:
             return "The limit query parameter is optional, but must be a valid int if provided (defaults to 100)."
         else:
-            return orderbook.getTradeHistory(pair, int(limit))
+            return orderbook.getTradeHistory(
+                pair,
+                int(limit))
+
     except Exception as e:
         print(e)
         return "An unexpected error occured."
