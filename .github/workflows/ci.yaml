@@ -4,8 +4,8 @@ on:
   pull_request:
 
 jobs:
-  validate-code:
-    name: Validate Code
+  validate-python:
+    name: Validate Python
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,10 +28,26 @@ jobs:
       - name: Python unit tests
         run: pytest
 
-  terraform-plan:
-    name: Terraform Plan
+  validate-docker-and-k8s:
+    name: Validate Docker and Kubernetes
     runs-on: ubuntu-latest
-    needs: validate-code
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Dockerfile validation
+        uses: hadolint/hadolint-action@master
+        with:
+            dockerfile: Dockerfile
+
+      - name: Kubernetes manifests validation
+        uses: instrumenta/kubeval-action@master
+        with:
+          files: k8s
+
+  validate-terraform:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: terraform
