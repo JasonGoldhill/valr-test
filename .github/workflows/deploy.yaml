@@ -74,16 +74,17 @@ jobs:
       with:
         find: "image: valr-test"
         replace: "image: gcr.io/valr-test/valr-test-image:${{ github.sha }}"
-        include: deployment.yaml
+        include: k8s/deployment.yaml
 
     - name: Replace image pull policy in deployment.yaml
       uses: jacobtomlinson/gha-find-replace@master
       with:
         find: "imagePullPolicy: Never"
         replace: "imagePullPolicy: Always"
-        include: deployment.yaml
+        include: k8s/deployment.yaml
 
     - name: Apply kubernetes manifests
       run: |
-        kubectl apply -f deployment.yaml
-        kubectl apply -f service.yaml
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
+        kubectl apply -f k8s/ingress.yaml

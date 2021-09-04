@@ -4,8 +4,49 @@ on:
   pull_request:
 
 jobs:
-  terraform-plan:
-    name: Terraform Plan
+  validate-python:
+    name: Validate Python
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Python setup
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Python requirements
+        run: pip install -r requirements.txt
+
+      - name: Python linter
+        uses: py-actions/flake8@v1
+        with:
+          ignore: "E501"
+          path: "api"
+
+      - name: Python unit tests
+        run: pytest
+
+  validate-docker-and-k8s:
+    name: Validate Docker and Kubernetes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Dockerfile validation
+        uses: hadolint/hadolint-action@master
+        with:
+            dockerfile: Dockerfile
+
+      - name: Kubernetes manifests validation
+        uses: instrumenta/kubeval-action@master
+        with:
+          files: k8s
+
+  validate-terraform:
+    name: Validate Terraform
     runs-on: ubuntu-latest
     defaults:
       run:

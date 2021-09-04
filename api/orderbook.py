@@ -9,6 +9,7 @@ btcTradeHistory = []
 ethTradeHistory = []
 xrpTradeHistory = []
 
+
 def getOrderbook(pair):
     if pair.upper() == "BTCZAR":
         bids = btcBids
@@ -21,13 +22,14 @@ def getOrderbook(pair):
         asks = xrpAsks
     else:
         return "The pair parameter must be a valid currency pair."
-    
+
     orderbook = {
         "Asks": asks,
         "Bids": bids
     }
 
     return orderbook
+
 
 def getTradeHistory(pair, limit):
     if pair.upper() == "BTCZAR":
@@ -38,7 +40,7 @@ def getTradeHistory(pair, limit):
         tradeHistory = xrpTradeHistory
     else:
         return "The pair parameter must be a valid currency pair."
-    
+
     if len(tradeHistory) > limit:
         history = {
             "TradeHistory": tradeHistory[:limit]
@@ -47,8 +49,9 @@ def getTradeHistory(pair, limit):
         history = {
             "TradeHistory": tradeHistory[:limit]
         }
-    
+
     return history
+
 
 def newLimitOrder(side, quantity, price, pair, postOnly):
     order = {
@@ -77,7 +80,7 @@ def newLimitOrder(side, quantity, price, pair, postOnly):
                 updateAsks(order, asks)
                 return "Order placed."
             else:
-                if postOnly == True:
+                if postOnly is True:
                     return "Post Only order cancelled as it would have matched."
                 else:
                     response = fillBid(order, bids, asks, tradeHistory)
@@ -92,7 +95,7 @@ def newLimitOrder(side, quantity, price, pair, postOnly):
                 updateBids(order, bids)
                 return "Order placed."
             else:
-                if postOnly == True:
+                if postOnly is True:
                     return "Post Only order cancelled as it would have matched."
                 else:
                     response = fillAsk(order, bids, asks, tradeHistory)
@@ -103,6 +106,7 @@ def newLimitOrder(side, quantity, price, pair, postOnly):
 
     else:
         return "The side parameter must be either BUY or SELL."
+
 
 def updateAsks(order, asks):
     if len(asks) > 0:
@@ -119,6 +123,7 @@ def updateAsks(order, asks):
     else:
         asks.append(order)
 
+
 def updateBids(order, bids):
     if len(bids) > 0:
         if order["price"] < bids[-1]["price"]:
@@ -134,21 +139,34 @@ def updateBids(order, bids):
     else:
         bids.append(order)
 
+
 def fillBid(order, bids, asks, tradeHistory):
     for bid in list(bids):
         if bid["price"] < order["price"]:
             break
         if bid["quantity"] > order["quantity"]:
-            updateTradeHistory(bid["price"], order["quantity"], "sell", tradeHistory)
+            updateTradeHistory(
+                bid["price"],
+                order["quantity"],
+                "sell",
+                tradeHistory)
             bid["quantity"] = bid["quantity"] - order["quantity"]
             order["quantity"] = 0
             break
         elif order["quantity"] > bid["quantity"]:
-            updateTradeHistory(bid["price"], bid["quantity"], "sell", tradeHistory)
+            updateTradeHistory(
+                bid["price"],
+                bid["quantity"],
+                "sell",
+                tradeHistory)
             bids.remove(bid)
             order["quantity"] = order["quantity"] - bid["quantity"]
         else:
-            updateTradeHistory(bid["price"], order["quantity"], "sell", tradeHistory)
+            updateTradeHistory(
+                bid["price"],
+                order["quantity"],
+                "sell",
+                tradeHistory)
             bids.remove(bid)
             order["quantity"] = 0
             break
@@ -159,21 +177,34 @@ def fillBid(order, bids, asks, tradeHistory):
     else:
         return "Order completely filled."
 
+
 def fillAsk(order, bids, asks, tradeHistory):
     for ask in list(asks):
         if ask["price"] > order["price"]:
             break
         if ask["quantity"] > order["quantity"]:
-            updateTradeHistory(ask["price"], order["quantity"], "buy", tradeHistory)
+            updateTradeHistory(
+                ask["price"],
+                order["quantity"],
+                "buy",
+                tradeHistory)
             ask["quantity"] = ask["quantity"] - order["quantity"]
             order["quantity"] = 0
             break
         elif order["quantity"] > ask["quantity"]:
-            updateTradeHistory(ask["price"], ask["quantity"], "buy", tradeHistory)
+            updateTradeHistory(
+                ask["price"],
+                ask["quantity"],
+                "buy",
+                tradeHistory)
             asks.remove(ask)
             order["quantity"] = order["quantity"] - ask["quantity"]
         else:
-            updateTradeHistory(ask["price"], order["quantity"], "buy", tradeHistory)
+            updateTradeHistory(
+                ask["price"],
+                order["quantity"],
+                "buy",
+                tradeHistory)
             asks.remove(ask)
             order["quantity"] = 0
             break
@@ -184,12 +215,13 @@ def fillAsk(order, bids, asks, tradeHistory):
     else:
         return "Order completely filled."
 
+
 def updateTradeHistory(price, quantity, takerSide, tradeHistory):
     entry = {
         "quantity": quantity,
         "price": price,
         "takerSide": takerSide
-    } 
+    }
 
     tradeHistory.insert(0, entry)
 
