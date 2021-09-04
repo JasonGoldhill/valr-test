@@ -48,7 +48,6 @@ jobs:
   validate-terraform:
     name: Validate Terraform
     runs-on: ubuntu-latest
-    needs: validate-code
     defaults:
       run:
         working-directory: terraform
