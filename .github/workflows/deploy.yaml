@@ -87,3 +87,8 @@ jobs:
       run: |
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
+
+    - name: Get svc ip address
+      run: |
+        kubectl get svc api-service -o json | jq -r .status.loadBalancer.ingress[0].ip
+      
