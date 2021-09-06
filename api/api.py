@@ -1,5 +1,6 @@
 import flask
 from flask import request
+from flask import render_template
 
 import orderbook
 
@@ -10,7 +11,7 @@ app.config["DEBUG"] = True
 # returns the homepage
 @app.route('/', methods=['GET'])
 def home():
-    return "Hello World"
+    return render_template("index.html")
 
 
 # handles the /orderbook endpoint
