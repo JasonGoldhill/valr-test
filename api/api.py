@@ -59,7 +59,7 @@ def placeLimitOrder():
 @app.route('/tradeHistory/<pair>', methods=['GET'])
 def getTradeHistory(pair):
     try:
-        limit = request.args.get('limit', 100)
+        limit = request.args.get('limit', '100')
 
         if limit.isnumeric() is False:
             return "The limit query parameter is optional, but must be a valid int if provided (defaults to 100)."
