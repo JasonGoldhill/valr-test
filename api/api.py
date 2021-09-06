@@ -28,7 +28,7 @@ def getOrderbook(pair):
 @app.route('/limitOrder', methods=['POST'])
 def placeLimitOrder():
     try:
-        #pulls json data from request body
+        # pulls json data from request body
         request_data = request.get_json()
         side = request_data.get("side")
         quantity = request_data.get("quantity")
@@ -66,7 +66,7 @@ def getTradeHistory(pair):
         # checks that the limit provided is a valid number
         if limit.isnumeric() is False:
             return "The limit query parameter is optional, but must be a valid int if provided (defaults to 100)."
-        
+
         else:
             return orderbook.getTradeHistory(pair, int(limit))
 
