@@ -29,7 +29,7 @@ To deploy the API to GKE:
 1. Raise a PR from `develop` into `main`
 2. Wait for the three Continuous Integration checks to pass successfully
 3. Merge the PR
-4. Naviage to the Actions tab in the repo and select the currently running `Build and Deploy` workflow
+4. Navigate to the Actions tab in the repo and select the currently running `Build and Deploy` workflow
 5. Wait for both the `Terraform Apply` and `Docker and Kubernetes` jobs to complete successfully
 6. Grab the ip address for the Kubernetes Service from the output of the `Get svc ip address` step in the `Docker and Kubernetes` job
 7. Navigate to `<ip address>:5000` to access the API
