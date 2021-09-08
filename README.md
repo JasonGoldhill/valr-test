@@ -135,18 +135,18 @@ curl --location --request POST 'localhost:5000/limitOrder' \
 }'
 ```
 Example response (if order did not match):
-```bash
+```
 Order placed.
 ```
 Example response (if order matched and partially filled):
-```bash
+```
 Order partially filled. Remainder placed in orderbook.
 ```
 Example response (if order matched and completely filled):
-```bash
+```
 Order completely filled.
 ```
 Example response (if `postOnly=true` stopped order from filling):
-```bash
+```
 Post Only order cancelled as it would have matched.
 ```
